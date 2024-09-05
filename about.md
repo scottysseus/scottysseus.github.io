@@ -13,3 +13,5 @@ Links:
 <br>
 
 This site uses [Jekyll](https://jekyllrb.com/) and a modified version of [jekyll-theme-console](https://github.com/b2a3e8/jekyll-theme-console).
+
+[View this site's source on GitHub.](https://github.com/scottysseus/scottysseus.github.io)
