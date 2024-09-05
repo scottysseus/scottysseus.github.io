@@ -30,8 +30,11 @@ theme: jekyll-theme-console
 style: hacker
 listen_for_clients_preferred_style: true
 header_pages:
-  - index.md
+  - posts.md
   - about.md
+
+tag_page_layout: tag_page
+tag_page_dir: tag
 
 # Exclude from processing.
 # The following items will not be processed, by default.

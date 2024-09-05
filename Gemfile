@@ -12,6 +12,7 @@ source "https://rubygems.org"
 gem "jekyll-theme-console"
 
 group :jekyll_plugins do
+  gem 'jekyll-tagging'
 end
 
 # Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem
