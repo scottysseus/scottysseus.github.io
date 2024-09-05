@@ -11,8 +11,8 @@ Just a casual gathering of trees
 <br>
 
 > "It is a lovely language, but it takes a very long time to say anything in it, unless it is worth taking a long time to say, and to listen to."
-
-- SWEBeard on Java
+> 
+> - SWEBeard on Java
 
 <br>
 
