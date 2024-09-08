@@ -5,35 +5,51 @@ date: "Sep 04 2024"
 tags: game-dev typescript web-app
 ---
 
-This is my first post about it, but last year, my wife and I made a browser game together! ♥️
+I am writing about it somewhat belatedly, but last year, Ana and I built a browser game called _Chadburn_ together! ♥️ You can play it at [https://chadburn.app](https://chadburn.app) and [check out the source on GitHub](https://github.com/scottysseus/chadburn-app).
 
-### About the game
+So, what prompted this endeavor? Well, just as Ana was wrapping up her coding bootcamp, I had the idea that a game project would not only be super fun, but also a great way for her to flex her new programming muscles and for me to try out some new tech I'd been eyeing for a while.
 
-Our game, [Chadburn](https://github.com/scottysseus/chadburn-app), is a browser port of the party board game [Wavelength](https://boardgamegeek.com/boardgame/262543/wavelength) by Alex Hague, Justin Vickers, and Wolfgang Warsch. Wavelength tests your and your friends' knowledge of each other: players (in two teams) take turns drawing a spectrum ("fragrant" to "malodorous") and giving their teammates a clue ("durian") to help them guess a random point along it. The team gets more points the more accurate the guess.
+I've long been inspired by the simple and elegant approach used to adapt the boardgame _Codenames_ for the web over at [https://horsepaste.com](https://horsepaste.com), so we decided to do the same for our game. A friend of mine owns a copy of the game [_Wavelength_](https://boardgamegeek.com/boardgame/262543/wavelength), and it seemed like the perfect candidate.
 
-We named our game after those old-timey [engine order telegraphs](https://en.wikipedia.org/wiki/Engine_order_telegraph) like they had in the movie _Titanic_; the most famous manufacturer of them was Chadburns Telegraph Co. of Liverpool.
+<img src="/images/wavelength-bg.webp" width="640" height="480" class="ml-auto mr-auto" alt="The boardgame Wavelength setup with its characteristic spectrum dial" title="The boardgame Wavelength setup with its characteristic spectrum dial"/>
 
-Chadburn is fully multiplayer, and we took a lot of design cues from the wonderful [horsepaste.com](horsepaste.com) in adapting Wavelength for the browser as simply as possible.
+It's wicked fun, extremely simple, and its gameplay seemed fairly easy to adapt to the web. At its core, _Wavelength_ is a game that tests your and your friends' knowledge of each other: players (in two teams) take turns drawing a spectrum card ("yummy" to "yucky") and giving their teammates a clue ("cilantro") to help them guess a random point along it. The team gets more points the more accurate the guess: in the image above, the blue region at the center of the targe is worth 4 points, the orange region is worth 2, and the yellow region is worth 1 point. Then, the opposing team has a chance to earn a point by correctly guessing if the target is to the left or right of the current team's guess. As I hinted at with my example, the clues get really subjective, which introduces a lot of fun and can lead to debates that get more heated than the game itself 😂.
+
+### Coming up with our theme
+
+In terms of gameplay, our game is a very faithful port of the original with basically zero modifications. To make the game even more casual, we introduced an extra _free play_ mode without teams or scoring, but that's it. We did still want to add our own flair to really make the end result our own, so we tried to get a bit clever with the game's theme and aesthetic.
+
+The game's spectrum dial reminded me of those old-timey [engine order telegraphs](https://en.wikipedia.org/wiki/Engine_order_telegraph) like they had in the movie _Titanic_, and that link formed the basis for our theme. We used a typewriter-esque font on top of a parchment-textured background to give it an aged feel. To create our spectrum dial, I used Inkscape to create a few SVGs, though I stuck with a simple black design rather than attempt to faithfully recreate a lifelike EOT. Finally, we incorporated the theme into the game's name: the most famous manufacturer of engine order telegraphs at the time was Chadburns Telegraph Co. of Liverpool.
+
+Here's a video of what the game play looks like. You'll see some of the multiplayer synchronization in action, too 🤓.
 
 <video width="640" height="480" controls>
  <source src="/videos/chadburn-demo.webm" type="video/webm">
 </video>
 
-As you can see, the host player starts the game, and from there they can share the URL with their friends to begin play.
-
 ### So how does it work?
+
+Although the game surface is quite simple, there's a lot going on under the hood to power its online multiplayer capability, and we invested a decent chunk of time in a slick CI/CD pipeline, all of which I'll explain below.
+
+#### Overview
+
+To start, here is (aspirational) architecture we followed:
+
+<img src="/images/chadburn-arch.png" width="640" height="480" class="ml-auto mr-auto" alt="Architecture diagram, i.e. boxes and lines" title="Architecture diagram, i.e. boxes and lines"/>
+
+At the heart of our stack is [Yjs](https://github.com/yjs/yjs), which offers a few CRDT primitives around which you can build a shared state framework with seamless conflict resolution. It also provides plugins for various networking standards (most importantly for us, WebRTC and WebSockets). In other words, Yjs allows us to easily implement a distributed, leaderless database that lives entirely in our clients' browsers! Of course, this means that if everyone in a game quits, the full game state is lost.
 
 #### Networking
 
-To keep server infrastructure as simple as possible, we used WebRTC for peer-to-peer networking between clients (AKA players) in each game. To keep each client's game state synchronized, we used [Yjs](https://github.com/yjs/yjs) (which provides most of the WebRTC networking out of the box). Yjs offers a few CRDT primitives around which you can build a shared state framework with seamless conflict resolution, and it also provides plugins for various networking standards (the aforementioned WebRTC, plus things like WebSockets) and open source text editors (its primary use case is collaborative document editing). In other words, Yjs allows us to easily implement a distributed, leaderless database that lives entirely in our clients' browsers! Of course, this means that if everyone in a game quits, the full game state is lost.
+To keep the server infrastructure as simple as possible, we used WebRTC for peer-to-peer networking between clients (AKA players) in each game. Yjs and its WebRTC plugin fully handled the exchange of game state updates between clients, and the automatic resolution of any conflicts that may arise as players interact with the game over the netweork. _Chadburn_ is not fully peer-to-peer, though: our architecture does require a "signaling server" to allow players in the same game to discover each other.
+
+Luckily, Yjs has a small example signaling server which uses WebSockets for communicating with the various clients. When a player starts a new game, they generate a unique code and send it to the server, which uses the code as the ID for a new WebSocket topic. They then share that code with the other players, who also send it to the server to join the same topic. The sample signaling server works well enough for our needs, for the most part. We just made a few small tweaks, converted it to TypeScript, and hosted it as a Docker container using GCP Cloud Run behind our custom domain. It's code lives in a separate repository, [chadburn-signaling](https://github.com/scottysseus/chadburn-signaling).
+
+Unfortunately, I wasn't able to figure out a way to make the signaling server truly stateless like we intended in our architecture diagram. Currently, the topic map is saved on the instance in memory. That's one shortcoming I'd like to address in a mini follow-up project.
 
 #### Client
 
 We had a lot of fun building the client using React. I found the [`useSyncExternalStore`](https://react.dev/reference/react/useSyncExternalStore) hook to be perfect for bringing in a Yjs document as the source of truth for game state: the main game board component passes events (each with a type and payload) to our Store, which uses a small state machine to translate them them into updates to the CRDT data structure. These (local) changes are merged with changes coming in from other clients, and then the updated state is passed as props to the game board, triggering a re-update. This part of the app felt super smooth! Beyond that, we used SVG for the Chadburn-inspired dial, which I made in Inkscape. Neither of us are very skilled as graphic designers, but we aimed to capture an early 20th century Titanic-y vibe with the font and parchment-textured background. After putting all those elements together, we deployed the front end app on [Firebase Hosting](https://firebase.google.com/docs/hosting) behind our custom domain. Firebase Hosting's CLI can also generate [GitHub Actions](https://firebase.google.com/docs/hosting/github-integration) that deploys to production with each merged pull request, which further simplified our pipeline.
-
-#### Server
-
-I mentioned above that our app is mostly peer-to-peer: it does require a signaling server for the various peers in a single game to discover each other. Luckily, Yjs has a small example signaling server which uses WebSockets for communicating with the various clients. We made a few small tweaks, converted it to TypeScript, and hosted it as a Docker container using GCP Cloud Run behind our custom domain. It's code lives in a separate repository, [chadburn-signaling](https://github.com/scottysseus/chadburn-signaling).
 
 #### Tooling
 
@@ -49,9 +65,9 @@ The most fun part was adding end-to-end tests! Firebase Hosting's GitHub Actions
 
 ### Highlights
 
-This was my wife's and my first project together, it was awesome and really special to work on something big like this over the course of a few months (complete with pull requests, code reviews, and design meetings 😜).
+This was my Ana's and my first project together, it was awesome and really special to work on something big like this over the course of a few months (complete with pull requests, code reviews, and design meetings 😜).
 
-Beyond that, I was very happy with the very tight integrations we achieved with all of our various tools. In particular, being able to quickly automate full games in our tests using Firebase Hosting + GitHub Actions + Cypress felt like a superpower!
+Beyond that, I was very happy with the tight integrations we achieved with all of our various tools. In particular, being able to quickly automate full games in our tests using Firebase Hosting + GitHub Actions + Cypress felt like a superpower!
 
 ### Challenges
 
