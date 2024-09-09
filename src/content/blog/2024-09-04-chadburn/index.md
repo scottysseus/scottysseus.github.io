@@ -5,7 +5,7 @@ date: "Sep 04 2024"
 tags: game-dev typescript web-app
 ---
 
-I am writing about it somewhat belatedly, but last year, Ana and I built a browser game called _Chadburn_ together! ♥️ You can play it at [https://chadburn.app](https://chadburn.app) and [check out the source on GitHub](https://github.com/scottysseus/chadburn-app).
+I am writing about it somewhat belatedly, but last year, Ana and I built a browser game called _Chadburn_! ♥️ You can play it at [https://chadburn.app](https://chadburn.app) and [check out the source on GitHub](https://github.com/scottysseus/chadburn-app).
 
 So, what prompted this endeavor? Well, just as Ana was wrapping up her coding bootcamp, I had the idea that a game project would not only be super fun but also a great way for her to flex her new programming muscles and for me to try out some new tech I'd been eyeing for a while.
 
@@ -13,7 +13,7 @@ I've long been inspired by the simple and elegant approach used to adapt the boa
 
 <img src="/images/wavelength-bg.webp" width="640" height="480" class="ml-auto mr-auto" alt="The boardgame Wavelength setup with its characteristic spectrum dial" title="The boardgame Wavelength setup with its characteristic spectrum dial"/>
 
-It's wicked fun, extremely simple, and its gameplay seemed fairly easy to adapt to the web. At its core, _Wavelength_ is a game that tests your and your friends' knowledge of each other: players (in two teams) take turns drawing a spectrum card ("yummy" to "yucky") and giving their teammates a clue ("cilantro") to help them guess a random point along it. The team gets more points the more accurate the guess: in the image above, the blue region at the center of the target is worth 4 points, the orange region is worth 2, and the yellow region is worth 1 point. Then, the opposing team has a chance to earn a point by correctly guessing if the target is to the left or right of the current team's guess. As I hinted at with my example, the clues get quite subjective, which introduces a lot of fun and can lead to debates that get more heated than the game itself 😂.
+It's wicked fun, extremely simple, and its gameplay seemed fairly easy to adapt to the web. At its core, _Wavelength_ is a game that tests your and your friends' knowledge of each other: players (in two teams) take turns drawing a spectrum card ("yummy" to "yucky") and giving their teammates a clue ("cilantro") to help them guess a random point along it. The team gets more points the more accurate the guess: in the image above, the blue region at the center of the target is worth 4 points, the orange region is worth 3, and the yellow region is worth 2 points. Then, the opposing team has a chance to earn a point by correctly guessing if the target is to the left or right of the current team's guess. As I hinted at with my example, the clues get quite subjective, which introduces a lot of fun and can lead to debates that get more heated than the game itself 😂.
 
 ### Coming up with our theme
 
