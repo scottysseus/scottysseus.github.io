@@ -10,7 +10,7 @@ export default defineConfig({
   site: "https://scottysseus.github.io/",
   integrations: [
     expressiveCode({
-      themes: ["rose-pine-dawn", "rose-pine-moon"],
+      themes: ["light-plus", "dark-plus"],
       useDarkModeMediaQuery: false,
       themeCssSelector: (theme) => `[data-theme='${theme.type}']`,
     }),

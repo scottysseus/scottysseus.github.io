@@ -30,7 +30,7 @@ I'll provide only a basic example with a single container testing a basic search
 
 Let's first look at the [`TestMain` function](https://github.com/scottysseus/ldap-testing-example/blob/master/ldap_test.go#L50):
 
-```go
+```go title="ldap_test.go"
 var port nat.Port
 
 func TestMain(m *testing.M) {
@@ -68,7 +68,7 @@ The container's port is saved in a package variable for use in the test itself.
 
 `startLDAPContainer` is where testcontainers-go comes into play:
 
-```go
+```go title="ldap_test.go"
 const imageName = "osixia/openldap:1.3.0"
 
 type ldapContainerRequest struct {
@@ -108,7 +108,7 @@ the copies instead.
 
 Finally, the test itself:
 
-```go
+```go title="ldap_test.go"
 // TestSearch attempts a basic search against the LDAP Docker container.
 // The search requires a bind using the default admin credentials.
 func TestSearch(t *testing.T) {
@@ -150,7 +150,7 @@ admin credentials provided by the container.
 
 Lastly, look at the LDIF:
 
-```
+```ldif title="testdata/test.ldif"
 dn: ou=users,dc=test,dc=com
 objectClass: organizationalUnit
 ou: users
