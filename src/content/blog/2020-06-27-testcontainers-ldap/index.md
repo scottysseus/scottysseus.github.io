@@ -9,14 +9,14 @@ LDAP is complex: it is an extensible standard with decades of history and dozens
 cumbersome (just look at [Jenkins](https://plugins.jenkins.io/ldap/) and 
 [Jira](https://confluence.atlassian.com/adminjiraserver/connecting-to-an-ldap-directory-938847052.html) for example) and makes integration testing crucial. 
 The most common approach I have seen (and which seems to be used by the [go-ldap](https://github.com/go-ldap/ldap/blob/45321a6717b4042e9f52290e409ff04aaed13c29/ldap_test.go#L8-L10) folks) 
-is to test LDAP integration code against [public LDAP servers](https://ldapwiki.com/wiki/Public%20LDAP%20Servers). Although this has desirable advantages, namely reduced test runtime and 
+is to test LDAP integration code against [public LDAP servers](https://ldapwiki.com/wiki/Public%20LDAP%20Servers). Although this has some advantages, namely reduced test runtime and 
 reduced test code complexity, sending requests to the public internet is not always an option and definitely makes the tests more brittle.
 
 In this post I'll demonstrate the use of Docker to facilitate LDAP integration testing in Golang. The full code can be found [on my GitHub](https://github.com/scottysseus/ldap-testing-example).
 
 ### Approach
 
-Some folks in France created an easy-to-use [Docker image for OpenLDAP](https://github.com/osixia/docker-openldap) that we'll use to facilitate the integration testing. 
+Some folks created an easy-to-use [Docker image for OpenLDAP](https://github.com/osixia/docker-openldap) that we'll use to facilitate the integration testing. 
 Aided by [testcontainers-go](https://github.com/testcontainers/testcontainers-go), we can easily create fixtures against which we can test basic LDAP integration and 
 more complex things like:
 
@@ -171,6 +171,3 @@ for the domain provided with the initial configuration.
 A link to the full working code is at the start of this article; try running it for yourself. For me, the test code takes only about a second or 2 
 to run, including the setup and teardown of the container and the test itself. This seems pretty cheap considering the flexibility afforded here 
 and the possibility this opens up for table-driven testing against potentially dozens of different configurations, including forests of LDAP servers.
-
-I could not find any other articles online covering this topic, so I decided to take that first step. Hopefully this article will serve as an 
-example for others to simplify their workflows and improve their code quality.
