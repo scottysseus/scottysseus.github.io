@@ -5,19 +5,19 @@ date: "Jun 27 2020"
 tags: golang testing docker
 ---
 
-LDAP is complex: it is an extensible standard with decades of history and dozens of vendors. This makes handling all possible use cases and configurations 
-cumbersome (just look at [Jenkins](https://plugins.jenkins.io/ldap/) and 
-[Jira](https://confluence.atlassian.com/adminjiraserver/connecting-to-an-ldap-directory-938847052.html) for example) and makes integration testing crucial. 
-The most common approach I have seen (and which seems to be used by the [go-ldap](https://github.com/go-ldap/ldap/blob/45321a6717b4042e9f52290e409ff04aaed13c29/ldap_test.go#L8-L10) folks) 
-is to test LDAP integration code against [public LDAP servers](https://ldapwiki.com/wiki/Public%20LDAP%20Servers). Although this has some advantages, namely reduced test runtime and 
+LDAP is complex: it is an extensible standard with decades of history and dozens of vendors. This makes handling all possible use cases and configurations
+cumbersome (just look at [Jenkins](https://plugins.jenkins.io/ldap/) and
+[Jira](https://confluence.atlassian.com/adminjiraserver/connecting-to-an-ldap-directory-938847052.html) for example) and makes integration testing crucial.
+The most common approach I have seen (and which seems to be used by the [go-ldap](https://github.com/go-ldap/ldap/blob/45321a6717b4042e9f52290e409ff04aaed13c29/ldap_test.go#L8-L10) folks)
+is to test LDAP integration code against [public LDAP servers](https://ldapwiki.com/wiki/Public%20LDAP%20Servers). Although this has some advantages, namely reduced test runtime and
 reduced test code complexity, sending requests to the public internet is not always an option and definitely makes the tests more brittle.
 
 In this post I'll demonstrate the use of Docker to facilitate LDAP integration testing in Golang. The full code can be found [on my GitHub](https://github.com/scottysseus/ldap-testing-example).
 
 ### Approach
 
-Some folks created an easy-to-use [Docker image for OpenLDAP](https://github.com/osixia/docker-openldap) that we'll use to facilitate the integration testing. 
-Aided by [testcontainers-go](https://github.com/testcontainers/testcontainers-go), we can easily create fixtures against which we can test basic LDAP integration and 
+Some folks created an easy-to-use [Docker image for OpenLDAP](https://github.com/osixia/docker-openldap) that we'll use to facilitate the integration testing.
+Aided by [testcontainers-go](https://github.com/testcontainers/testcontainers-go), we can easily create fixtures against which we can test basic LDAP integration and
 more complex things like:
 
 - TLS configuration
@@ -30,7 +30,7 @@ I'll provide only a basic example with a single container testing a basic search
 
 Let's first look at the [`TestMain` function](https://github.com/scottysseus/ldap-testing-example/blob/master/ldap_test.go#L50):
 
-```golang
+```go
 var port nat.Port
 
 func TestMain(m *testing.M) {
@@ -58,17 +58,17 @@ func TestMain(m *testing.M) {
 }
 ```
 
-This code calls a function, `startLDAPContainer`, and provides it with an `ldapContainerRequest` object. In the request object it provides parameters for the 
+This code calls a function, `startLDAPContainer`, and provides it with an `ldapContainerRequest` object. In the request object it provides parameters for the
 container: the path to an LDIF file for our test data and information on the domain and organization.
 
-Crucially, we defer the removal of the containers until the tests complete. In this example I am starting the container at the package level, but this can 
+Crucially, we defer the removal of the containers until the tests complete. In this example I am starting the container at the package level, but this can
 be adapted to instead start containers on a per-test basis as well.
 
 The container's port is saved in a package variable for use in the test itself.
 
 `startLDAPContainer` is where testcontainers-go comes into play:
 
-```golang
+```go
 const imageName = "osixia/openldap:1.3.0"
 
 type ldapContainerRequest struct {
@@ -101,14 +101,14 @@ func startLDAPContainer(ctx context.Context, ldapReq ldapContainerRequest) (test
 }
 ```
 
-This code sets up the osixia/openldap container. I recommend going over their documentation for more information, but I would like to highlight here the bit 
-where `--copy-service` is added to the container `CMD`. It is necessary because the container's startup scripts make modifications to the LDIF files during 
-startup; when using a bind mount, this can cause the startup to fail. The flag directs the startup scripts to copy the LDIF files and make modifications on 
+This code sets up the osixia/openldap container. I recommend going over their documentation for more information, but I would like to highlight here the bit
+where `--copy-service` is added to the container `CMD`. It is necessary because the container's startup scripts make modifications to the LDIF files during
+startup; when using a bind mount, this can cause the startup to fail. The flag directs the startup scripts to copy the LDIF files and make modifications on
 the copies instead.
 
 Finally, the test itself:
 
-```golang
+```go
 // TestSearch attempts a basic search against the LDAP Docker container.
 // The search requires a bind using the default admin credentials.
 func TestSearch(t *testing.T) {
@@ -163,11 +163,11 @@ displayName: User One
 uid: user1
 ```
 
-For the sake of this example it is simple with just one user and one organizational unit. Note that the container will automatically create the entries 
+For the sake of this example it is simple with just one user and one organizational unit. Note that the container will automatically create the entries
 for the domain provided with the initial configuration.
 
 ### Assessment
 
-A link to the full working code is at the start of this article; try running it for yourself. For me, the test code takes only about a second or 2 
-to run, including the setup and teardown of the container and the test itself. This seems pretty cheap considering the flexibility afforded here 
+A link to the full working code is at the start of this article; try running it for yourself. For me, the test code takes only about a second or 2
+to run, including the setup and teardown of the container and the test itself. This seems pretty cheap considering the flexibility afforded here
 and the possibility this opens up for table-driven testing against potentially dozens of different configurations, including forests of LDAP servers.
