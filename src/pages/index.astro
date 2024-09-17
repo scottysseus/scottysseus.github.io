@@ -5,7 +5,6 @@ import PageLayout from "@layouts/PageLayout.astro";
 import ArrowCard from "@components/ArrowCard.astro";
 import Link from "@components/Link.astro";
 import { SITE, HOME } from "@consts";
-import { analytics } from "../analytics";
 
 const blog = (await getCollection("blog"))
   .filter((post) => !post.data.draft)
@@ -14,6 +13,9 @@ const blog = (await getCollection("blog"))
 ---
 
 <PageLayout title={HOME.TITLE} description={HOME.DESCRIPTION}>
+  <script>
+    import { analytics } from "../analytics";
+  </script>
   <Container>
     <h4 class="animate font-semibold text-black dark:text-white">
       Welcome to Scott's Odyssey
