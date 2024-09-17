@@ -4,7 +4,6 @@ export const SITE: Site = {
   NAME: "Scott's Odyssey",
   EMAIL: "sweidenkopf@gmail.com",
   NUM_POSTS_ON_HOMEPAGE: 3,
-  NUM_PROJECTS_ON_HOMEPAGE: 3,
 };
 
 export const HOME: Metadata = {
