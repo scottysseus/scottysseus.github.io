@@ -7,7 +7,7 @@ import expressiveCode from "astro-expressive-code";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://scottysseus.github.io/",
+  site: "https://scottysseus.me/",
   integrations: [
     expressiveCode({
       themes: ["light-plus", "dark-plus"],
