@@ -11,9 +11,9 @@ I realized I had one problem that these LLMs seemed perfectly suited to solve: r
 
 Imagine you're like me and your "cookbook" is just a Google Keep note with a list of the URLs for ~70 recipe blog posts from all over the web. Dealing with Keep on mobile kinda sucks but that's a separate issue. Bigger concerns include the possibility that the author of the recipe might take it down or modify it. Then, there's the hassle of fighting through ads and fluff to scroll down to the actual recipe. I realized it wouldn't be too difficult to set up an app that can scrape those sites and hand them off to an LLM to extract the recipe and return it in some structured form like JSON.
 
-So, I built [Recipie](https://github.com/scottysseus/recipie), a simple recipe organizing tool where you can copy your list of recipe links from wherever you keep them and with a single click automatically import them into one place. I don't have it hosted
+So, I built [Recipie](https://github.com/scottysseus/recipie), a simple recipe organizing tool where you can copy your list of recipe links from wherever you keep them and with a single click automatically import them into one place. 
 
-Here's a demo to showcase it:
+I don't have it hosted publicly because Vertex is kind of expensive and I'm a miser, but here's a demo to showcase it:
 
 <video width="640" height="480" controls>
  <source src="/videos/recipie-demo.webm" type="video/webm">
